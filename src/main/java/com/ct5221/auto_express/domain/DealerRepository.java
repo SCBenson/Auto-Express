@@ -9,5 +9,7 @@ import java.util.Optional;
 @Repository
 public interface DealerRepository extends JpaRepository<Dealer, Long> {
     Optional<Dealer> findByUsername(String username);
+    Optional<Dealer> findByEmail(String email);
+    Optional<Dealer> findByPhone(String phone);
     List<Dealer> findByUsernameContainingIgnoreCase(String username);
 }

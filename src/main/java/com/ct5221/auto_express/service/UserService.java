@@ -2,23 +2,55 @@ package com.ct5221.auto_express.service;
 
 import com.ct5221.auto_express.domain.User;
 import com.ct5221.auto_express.domain.UserRepository;
+import com.ct5221.auto_express.domain.VehicleRepository;
+import com.ct5221.auto_express.domain.Vehicle;
+import com.ct5221.auto_express.exception.ResourceExceptionHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
 @Transactional
 public class UserService {
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private VehicleRepository vehicleRepository;
+
+    public UserService(UserRepository userRepository, VehicleRepository vehicleRepository) {
         this.userRepository = userRepository;
+        this.vehicleRepository = vehicleRepository;
     }
 
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findByPhone(String phone) {
+        return userRepository.findByPhone(phone);
+    }
+
+    public List<User> findByUsernameContains(String keyword){
+        return userRepository.findByUsernameContains(keyword);
+    }
+
+    public User purchaseVehicle(Long userId, Long vehicleId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if(user == null) return null;
+        Vehicle vehicle = vehicleRepository.findById(vehicleId).orElse(null);
+        if(vehicle == null) return null;
+
+        user.getPurchasedVehicles().add(vehicle);
+        return userRepository.save(user);
     }
 
     public List<User> getAllUsers(){ return (List<User>) userRepository.findAll(); }
@@ -39,6 +71,13 @@ public class UserService {
         user.setPassword(userDetails.getPassword());
 
         return userRepository.save(user);
+    }
+
+    public void updatePassword(Long id, String newPassword){
+        userRepository.findById(id).ifPresent(user -> {
+            user.setPassword(newPassword);
+            userRepository.save(user);
+        });
     }
 
     public void deleteUserById(Long id) {
@@ -90,5 +129,11 @@ public class UserService {
 
     public List<User> searchUsers(String searchTerm) {
         return userRepository.findByUsernameContainingIgnoreCase(searchTerm);
+    }
+
+    public List<Vehicle> getPurchasedVehicles(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceExceptionHandler("User not found with id: " + userId));
+        return new ArrayList<>(user.getPurchasedVehicles());
     }
 }

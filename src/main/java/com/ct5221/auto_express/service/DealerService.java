@@ -2,6 +2,8 @@ package com.ct5221.auto_express.service;
 
 import com.ct5221.auto_express.domain.Dealer;
 import com.ct5221.auto_express.domain.DealerRepository;
+import com.ct5221.auto_express.domain.Vehicle;
+import com.ct5221.auto_express.domain.VehicleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,7 @@ import java.util.Optional;
 @Transactional
 public class DealerService {
     private final DealerRepository dealerRepository;
+    private VehicleRepository vehicleRepository;
 
     public DealerService(DealerRepository dealerRepository){
         this.dealerRepository = dealerRepository;
@@ -23,6 +26,18 @@ public class DealerService {
 
     public List<Dealer> getAllDealers() {
         return (List<Dealer>) dealerRepository.findAll();
+    }
+
+    public Optional<Dealer> findByUsername(String username) {
+        return dealerRepository.findByUsername(username);
+    }
+
+    public Optional<Dealer> findByEmail(String email) {
+        return dealerRepository.findByEmail(email);
+    }
+
+    public Optional<Dealer> findByPhone(String phone) {
+        return dealerRepository.findByPhone(phone);
     }
 
     public Dealer createDealer(Dealer dealer){
@@ -53,6 +68,39 @@ public class DealerService {
         dealer.setPhone(normalizePhone(dealerDetails.getPhone()));
         dealer.setPassword(dealerDetails.getPassword());
 
+        return dealerRepository.save(dealer);
+    }
+
+    public Dealer addVehicleToInventory(Long dealerId, Long vehicleId) {
+        Optional<Dealer> dealerOpt = dealerRepository.findById(dealerId);
+        if(!dealerOpt.isPresent()){
+            return null;
+        }
+
+        Dealer dealer = dealerOpt.get();
+        Optional<Vehicle> vehicleOpt = vehicleRepository.findById(vehicleId);
+        if(!vehicleOpt.isPresent()){
+            return null;
+        }
+
+        Vehicle vehicle = vehicleOpt.get();
+        dealer.getInventory().add(vehicle);
+        return dealerRepository.save(dealer);
+    }
+
+    public Dealer updateContactInfo(Long id, String email, String phone) {
+        Optional<Dealer> dealerOpt = dealerRepository.findById(id);
+        if(!dealerOpt.isPresent()){
+            return null;
+        }
+
+        Dealer dealer = dealerOpt.get();
+        if (email != null && !email.isEmpty()){
+            dealer.setEmail(email);
+        }
+        if(phone != null && !phone.isEmpty()){
+            dealer.setPhone(phone);
+        }
         return dealerRepository.save(dealer);
     }
 

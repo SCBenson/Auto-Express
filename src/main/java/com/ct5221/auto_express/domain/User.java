@@ -2,6 +2,9 @@ package com.ct5221.auto_express.domain;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="users")
 
@@ -39,4 +42,17 @@ public class User {
 
     public String getPassword() {return password; }
     public void setPassword(String password) {this.password = password; }
+
+    @OneToMany
+    @JoinColumn(name = "owner_id")
+    private List<Vehicle> purchasedVehicles = new ArrayList<>();
+
+    public List<Vehicle> getPurchasedVehicles(){
+        return purchasedVehicles;
+    }
+
+    public void setPurchasedVehicles(List<Vehicle> purchasedVehicles){
+        this.purchasedVehicles = purchasedVehicles;
+    }
+
 }

@@ -1,6 +1,9 @@
 package com.ct5221.auto_express.domain;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="dealers")
 
@@ -14,6 +17,18 @@ public class Dealer {
     private String email;
     private String phone;
     private String password;
+
+    @OneToMany(mappedBy = "dealer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Vehicle> inventory = new ArrayList<>();
+
+    public List<Vehicle> getInventory(){
+        return inventory;
+    }
+
+    public void setInventory(List<Vehicle> inventory){
+        this.inventory = inventory;
+    }
+
 
     public Dealer(){}
 
