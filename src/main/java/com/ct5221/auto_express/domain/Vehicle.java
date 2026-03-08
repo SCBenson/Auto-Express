@@ -1,6 +1,7 @@
 package com.ct5221.auto_express.domain;
 import jakarta.persistence.*;
 
+
 @Entity
 @Table(name="vehicles")
 public class Vehicle {
@@ -36,4 +37,18 @@ public class Vehicle {
     public void setYear(int year) {this.year = year; }
     public double getPrice() { return price; }
     public void setPrice(double price) {this.price = price;}
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dealer_id")
+    private Dealer dealer;
+
+    public Dealer getDealer(){
+        return dealer;
+    }
+
+    public void setDealer(Dealer dealer){
+        this.dealer = dealer;
+    }
+
+
 }

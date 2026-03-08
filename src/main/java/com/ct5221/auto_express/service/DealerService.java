@@ -14,10 +14,12 @@ import java.util.Optional;
 @Transactional
 public class DealerService {
     private final DealerRepository dealerRepository;
-    private VehicleRepository vehicleRepository;
+    private final VehicleRepository vehicleRepository;
 
-    public DealerService(DealerRepository dealerRepository){
+    public DealerService(DealerRepository dealerRepository, VehicleRepository vehicleRepository){
+
         this.dealerRepository = dealerRepository;
+        this.vehicleRepository = vehicleRepository;
     }
 
     public Optional<Dealer> getDealerById(Long id) {
@@ -72,18 +74,14 @@ public class DealerService {
     }
 
     public Dealer addVehicleToInventory(Long dealerId, Long vehicleId) {
-        Optional<Dealer> dealerOpt = dealerRepository.findById(dealerId);
-        if(!dealerOpt.isPresent()){
-            return null;
-        }
+        Dealer dealer = dealerRepository.findById(dealerId)
+                .orElseThrow(() -> new RuntimeException("Dealer not found"));
 
-        Dealer dealer = dealerOpt.get();
-        Optional<Vehicle> vehicleOpt = vehicleRepository.findById(vehicleId);
-        if(!vehicleOpt.isPresent()){
-            return null;
-        }
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
-        Vehicle vehicle = vehicleOpt.get();
+        //Vehicle vehicle = vehicleOpt.get();
+        vehicle.setDealer(dealer);
         dealer.getInventory().add(vehicle);
         return dealerRepository.save(dealer);
     }
