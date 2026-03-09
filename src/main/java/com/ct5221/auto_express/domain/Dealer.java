@@ -19,7 +19,7 @@ public class Dealer {
     private String password;
 
     @OneToMany(mappedBy = "dealer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Vehicle> inventory = new ArrayList<>();
+    private List<Vehicle> inventory = new ArrayList<>(); //A dealer has many vehicles.
 
     public List<Vehicle> getInventory(){
         return inventory;

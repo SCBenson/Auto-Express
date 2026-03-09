@@ -40,7 +40,7 @@ public class Vehicle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dealer_id")
-    private Dealer dealer;
+    private Dealer dealer; // A vehicle belongs to one dealer.
 
     public Dealer getDealer(){
         return dealer;
