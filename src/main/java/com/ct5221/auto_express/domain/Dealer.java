@@ -13,6 +13,7 @@ public class Dealer {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
     @Column(nullable = false, unique = true)
+    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     private String username;
     @NotNull(message = "First Name cannot be null")
     @Size(min = 2, max = 100, message = "First Name must be between 2 and 100 characters")
