@@ -3,7 +3,7 @@
 ## Week 1: Core Backend (Days 1-7)
 
 ### Days 1-2: Entity Relationships & Basic Validation
-- [ ] Add bidirectional `@OneToMany` in `Dealer` entity for vehicles
+- [X] Add bidirectional `@OneToMany` in `Dealer` entity for vehicles
 - [ ] Add `@Valid` and basic constraints (`@NotNull`, `@Email`, `@Min`)
 - [ ] Write 2-3 simple unit tests for entity validation
 
