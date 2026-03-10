@@ -108,13 +108,17 @@ public class DealerController {
         DealerDTO dto = new DealerDTO();
         dto.setId(dealer.getId());
         dto.setUsername(dealer.getUsername());
+        dto.setFirstName(dealer.getFirstName());
+        dto.setLastName(dealer.getLastName());
         dto.setEmail(dealer.getEmail());
+        dto.setAge(dealer.getAge());
         dto.setPhone(dealer.getPhone());
+        dto.setPassword(dealer.getPassword());
         return dto;
     }
 
     private Dealer convertToEntity(DealerDTO dto){
-        return new Dealer(dto.getUsername(), dto.getEmail(), dto.getPhone(), dto.getPassword());
+        return new Dealer(dto.getUsername(), dto.getFirstName(), dto.getLastName(), dto.getEmail(), dto.getAge(), dto.getPhone(), dto.getPassword());
     }
 
 

@@ -117,12 +117,16 @@ public class UserController {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
         dto.setEmail(user.getEmail());
+        dto.setAge(user.getAge());
         dto.setPhone(user.getPhone());
+        dto.setPassword(user.getPassword());
         return dto;
     }
 
     private User convertToEntity(UserDTO dto) {
-        return new User(dto.getUsername(), dto.getEmail(), dto.getPhone(), dto.getPassword());
+        return new User(dto.getUsername(), dto.getFirstName(), dto.getLastName(), dto.getEmail(), dto.getAge(), dto.getPhone(), dto.getPassword());
     }
 }
