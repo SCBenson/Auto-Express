@@ -13,6 +13,8 @@ public class Vehicle {
     private String make;
     @NotNull(message = "Model cannot be null")
     private String model;
+    @NotNull(message = "Color cannot be null")
+    private String color;
     @Min(value = 1900, message= "Year must be no earlier than 1900")
     private Integer year;
     @Min(value=0, message= "Mileage must be positive")
@@ -22,9 +24,10 @@ public class Vehicle {
 
     public Vehicle() {}
 
-    public Vehicle(String make, String model, Integer year, Double mileage, Double price){
+    public Vehicle(String make, String model, String color, Integer year, Double mileage, Double price){
         this.make = make;
         this.model = model;
+        this.color = color;
         this.year = year;
         this.mileage = mileage;
         this.price = price;
@@ -42,6 +45,8 @@ public class Vehicle {
     public void setMileage(Double mileage) { this.mileage = mileage; }
     public Double getPrice() { return price; }
     public void setPrice(Double price) {this.price = price; }
+    public String getColor() { return color;}
+    public void setColor(String color) { this.color = color;}
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dealer_id")
