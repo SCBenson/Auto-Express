@@ -4,8 +4,8 @@
 
 ### Days 1-2: Entity Relationships & Basic Validation
 - [X] Add bidirectional `@OneToMany` in `Dealer` entity for vehicles
-- [ ] Add `@Valid` and basic constraints (`@NotNull`, `@Email`, `@Min`)
-- [ ] Write 2-3 simple unit tests for entity validation
+- [X] Add `@Valid` and basic constraints (`@NotNull`, `@Email`, `@Min`)
+- [X] Write 2-3 simple unit tests for entity validation
 
 ### Days 3-4: Basic Security with JWT
 - [ ] Add Spring Security dependency to `build.gradle`
