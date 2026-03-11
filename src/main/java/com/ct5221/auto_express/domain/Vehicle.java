@@ -14,8 +14,10 @@ public class Vehicle {
     @NotNull(message = "Model cannot be null")
     private String model;
     @NotNull(message = "Color cannot be null")
+    @Pattern(regexp = "^[a-zA-Z]+$", message = "Color must contain only letters")
     private String color;
     @Min(value = 1900, message= "Year must be no earlier than 1900")
+    @Max(value = 2026, message= "Year must be no later than 2026")
     private Integer year;
     @Min(value=0, message= "Mileage must be positive")
     private Double mileage;
