@@ -27,10 +27,16 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+	// JUnit 5 (compatible versions)
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Validation
 	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 	testImplementation 'org.glassfish:jakarta.el:4.0.2'
+
+	// Spring Boot Test (for later integration tests)
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
