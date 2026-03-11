@@ -8,7 +8,7 @@
 - [X] Write 2-3 simple unit tests for entity validation
 
 ### Days 3-4: Basic Security with JWT
-- [ ] Add Spring Security dependency to `build.gradle`
+- [X] Add Spring Security dependency to `build.gradle`
 - [ ] Create simple `JwtUtil` class (copy from tutorial)
 - [ ] Create `AuthController` with login endpoint only
 - [ ] Test login manually with Postman
