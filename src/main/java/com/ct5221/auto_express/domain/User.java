@@ -1,5 +1,6 @@
 package com.ct5221.auto_express.domain;
 
+import com.ct5221.auto_express.security.Authenticatable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -9,7 +10,7 @@ import java.util.List;
 @Entity
 @Table(name="users")
 
-public class User {
+public class User implements Authenticatable {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
@@ -36,9 +37,11 @@ public class User {
             message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
 
+    private String location;
+
     public User(){}
 
-    public User(String firstName, String lastName, String username, String email, Integer age, String phone, String password){
+    public User(String firstName, String lastName, String username, String email, Integer age, String phone, String password, String location){
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -46,6 +49,7 @@ public class User {
         this.age = age;
         this.phone = phone;
         this.password = password;
+        this.location = location;
     }
 
     public Long getId() {return id; }
@@ -71,6 +75,14 @@ public class User {
 
     public String getPassword() {return password; }
     public void setPassword(String password) {this.password = password; }
+
+    public String getLocation() {return location; }
+    public void setLocation(String location) {this.location = location; }
+
+    @Override
+    public String getRole(){
+        return "USER";
+    }
 
     @OneToMany
     @JoinColumn(name = "owner_id")
