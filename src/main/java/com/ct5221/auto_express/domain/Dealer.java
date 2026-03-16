@@ -1,4 +1,5 @@
 package com.ct5221.auto_express.domain;
+import com.ct5221.auto_express.security.Authenticatable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -8,7 +9,7 @@ import java.util.List;
 @Entity
 @Table(name="dealers")
 
-public class Dealer {
+public class Dealer implements Authenticatable {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
@@ -34,6 +35,9 @@ public class Dealer {
             message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
 
+    private String dealershipName;
+    private String location;
+
     @OneToMany(mappedBy = "dealer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vehicle> inventory = new ArrayList<>(); //A dealer has many vehicles.
 
@@ -47,7 +51,7 @@ public class Dealer {
 
     public Dealer(){}
 
-    public Dealer(String firstName, String lastName, String username, String email, Integer age, String phone, String password){
+    public Dealer(String firstName, String lastName, String username, String email, Integer age, String phone, String password, String dealershipName, String location){
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -55,6 +59,8 @@ public class Dealer {
         this.age = age;
         this.phone = phone;
         this.password = password;
+        this.dealershipName = dealershipName;
+        this.location = location;
     }
 
     public Long getId() {return id; }
@@ -80,5 +86,16 @@ public class Dealer {
 
     public String getPassword() {return password; }
     public void setPassword(String password) {this.password = password; }
+
+    public String getDealershipName() {return dealershipName; }
+    public void setDealershipName(String dealershipName) {this.dealershipName = dealershipName; }
+
+    public String getLocation() {return location; }
+    public void setLocation(String location) {this.location = location; }
+
+    @Override
+    public String getRole(){
+        return "DEALER";
+    }
 
 }
