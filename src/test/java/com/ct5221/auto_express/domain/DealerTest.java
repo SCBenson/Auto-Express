@@ -30,7 +30,9 @@ class DealerTest {
                 "john@example.com",
                 25,
                 "1234567890",
-                "Password1@"
+                "Password1@",
+                "John's Dealership",
+                "New York"
         );
 
         Set<ConstraintViolation<Dealer>> violations = validator.validate(dealer);
@@ -47,7 +49,9 @@ class DealerTest {
                 "invalid-email",  // Invalid email
                 25,
                 "1234567890",
-                "Password1@"
+                "Password1@",
+                "John's Dealership",
+                "New York"
         );
 
         Set<ConstraintViolation<Dealer>> violations = validator.validate(dealer);
@@ -66,7 +70,9 @@ class DealerTest {
                 "john@example.com",
                 25,
                 "1234567890",
-                "weak"  // Doesn't meet password requirements
+                "weak",  // Doesn't meet password requirements
+                "John's Dealership",
+                "New York"
         );
 
         Set<ConstraintViolation<Dealer>> violations = validator.validate(dealer);
@@ -88,7 +94,9 @@ class DealerTest {
                 "john@example.com",
                 16,  // Below minimum age
                 "1234567890",
-                "Password1@"
+                "Password1@",
+                "John's Dealership",
+                "New York"
         );
 
         Set<ConstraintViolation<Dealer>> violations = validator.validate(dealer);
@@ -106,7 +114,9 @@ class DealerTest {
                 "john@example.com",
                 25,
                 "12345",  // Invalid length
-                "Password1@"
+                "Password1@",
+                "John's Dealership",
+                "New York"
         );
 
         Set<ConstraintViolation<Dealer>> violations = validator.validate(dealer);
