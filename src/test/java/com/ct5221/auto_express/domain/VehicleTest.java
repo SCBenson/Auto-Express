@@ -7,6 +7,7 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +30,8 @@ public class VehicleTest {
                 "Red",
                 2020,
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertTrue(violations.isEmpty(), "Valid vehicle should have no violations");
@@ -43,7 +45,8 @@ public class VehicleTest {
                 "Red",
                 2020,
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for null make");
@@ -58,7 +61,8 @@ public class VehicleTest {
                 "Red",
                 2020,
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for null model");
@@ -74,7 +78,8 @@ public class VehicleTest {
                 "Red123", // Invalid color with numbers
                 2020,
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for invalid color");
@@ -89,7 +94,8 @@ public class VehicleTest {
                 "Red!", // Invalid color with special characters
                 2020,
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for invalid color");
@@ -104,7 +110,8 @@ public class VehicleTest {
                 null, // Invalid null color
                 2020,
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for null color");
@@ -119,7 +126,8 @@ public class VehicleTest {
                 "Red",
                 1899, // Invalid year too early
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for invalid year");
@@ -134,7 +142,8 @@ public class VehicleTest {
                 "Red",
                 2027, // Invalid year too early
                 15000.0,
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for invalid year");
@@ -149,7 +158,8 @@ public class VehicleTest {
                 "Red",
                 2020,
                 -1000.0, // Invalid negative mileage
-                20000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for negative mileage");
@@ -165,7 +175,8 @@ public class VehicleTest {
                 "Red",
                 2020,
                 15000.0,
-                -5000.0 // Invalid negative price
+                new BigDecimal("-5000.0"), // Invalid negative price
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertFalse(violations.isEmpty(), "Should have violations for negative price");
@@ -181,7 +192,8 @@ public class VehicleTest {
                 "Black",
                 1900, // Boundary: minimum valid year
                 0.0,
-                5000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertTrue(violations.isEmpty(), "Year 1900 should be valid");
@@ -195,7 +207,8 @@ public class VehicleTest {
                 "White",
                 2024,
                 0.0, // Boundary: zero mileage (new vehicle)
-                50000.0
+                new BigDecimal("20000.0"),
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertTrue(violations.isEmpty(), "Zero mileage should be valid");
@@ -208,7 +221,8 @@ public class VehicleTest {
                 "Blue",
                 2020,
                 15000.0,
-                0.0 // Boundary: zero price (free vehicle)
+                new BigDecimal("0.0"), // Boundary: zero price (free vehicle)
+                true
         );
         Set<ConstraintViolation<Vehicle>> violations = validator.validate(vehicle);
         assertTrue(violations.isEmpty(), "Zero price should be valid");
