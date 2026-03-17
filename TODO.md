@@ -9,8 +9,9 @@
 
 ### Days 3-4: Basic Security with JWT
 - [X] Add Spring Security dependency to `build.gradle`
-- [ ] Create simple `JwtUtil` class (copy from tutorial)
-- [ ] Create `AuthController` with login endpoint only
+- [X] Create simple `JwtUtil` class (copy from tutorial) Add parameters location & dealershipName to DTO, Service, Controller
+- [X] Create `AuthController` with login endpoint only
+- [X] Unit Test the `AuthController`
 - [ ] Test login manually with Postman
 
 ### Days 5-6: Move Logic to Services
