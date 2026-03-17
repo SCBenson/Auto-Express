@@ -18,25 +18,29 @@ public class User implements Authenticatable {
     private String username;
     @NotNull(message = "First Name cannot be null")
     @Size(min = 2, max = 100, message = "First Name must be between 2 and 100 characters")
+    @Column(nullable = false)
     private String firstName;
     @NotNull(message = "Last Name cannot be null")
     @Size(min = 2, max = 100, message = "Last Name must be between 2 and 100 characters")
+    @Column(nullable = false)
     private String lastName;
     @Column(nullable = false)
     @NotNull(message = "Email cannot be null")
     @Email(message = "Email should be valid")
     private String email;
     @Min(value = 18, message = "Age must be at least 18")
+    @Column(nullable = false)
     private Integer age;
     @NotNull(message = "Phone number cannot be null")
     @Size(min = 10, max=10, message = "Phone number must be 10 digits")
+    @Column(nullable = false)
     private String phone;
     @NotNull(message = "Password cannot be null")
     @Size(min = 8, message = "Password must be at least 8 characters long")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
+    //@Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            //message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
-
+    @Column(nullable = false)
     private String location;
 
     public User(){}
