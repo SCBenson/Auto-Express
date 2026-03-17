@@ -19,28 +19,31 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test:4.0.0")
+	// Validation
+	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+	testImplementation 'org.glassfish:jakarta.el:4.0.2'
+	// Spring Boot Test (for later integration tests)
 	// JUnit 5 (compatible versions)
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// Validation
-	testImplementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
-	testImplementation 'org.glassfish:jakarta.el:4.0.2'
 
-	// Spring Boot Test (for later integration tests)
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
 }
 
 test {
