@@ -11,6 +11,8 @@ public class DealerDTO {
     private Integer age;
     private String phone;
     private String password;
+    private String dealershipName;
+    private String location;
     private List<Long> vehicleIds;
 
     public DealerDTO(){}
@@ -48,6 +50,12 @@ public class DealerDTO {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public String getDealershipName() { return dealershipName; }
+    public void setDealershipName(String dealershipName) { this.dealershipName = dealershipName; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
     public List<Long> getVehicleIds() { return vehicleIds; }
     public void setVehicleIds(List<Long> vehicleIds) { this.vehicleIds = vehicleIds;}

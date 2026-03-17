@@ -9,6 +9,7 @@ public class UserDTO {
     private Integer age;
     private String phone;
     private String password;
+    private String location;
 
     public UserDTO() {}
 
@@ -45,4 +46,7 @@ public class UserDTO {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 }
