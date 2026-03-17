@@ -75,10 +75,11 @@ public class VehicleController {
         dto.setYear(vehicle.getYear());
         dto.setMileage(vehicle.getMileage());
         dto.setPrice(vehicle.getPrice());
+        dto.setAvailable(vehicle.getAvailable());
         return dto;
     }
 
     private Vehicle convertToEntity(VehicleDTO dto){
-        return new Vehicle(dto.getMake(), dto.getModel(), dto.getColor(), dto.getYear(), dto.getMileage(), dto.getPrice());
+        return new Vehicle(dto.getMake(), dto.getModel(), dto.getColor(), dto.getYear(), dto.getMileage(), dto.getPrice(), dto.getAvailable());
     }
 }
