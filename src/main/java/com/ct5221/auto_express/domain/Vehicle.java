@@ -2,6 +2,8 @@ package com.ct5221.auto_express.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+
 
 @Entity
 @Table(name="vehicles")
@@ -21,18 +23,22 @@ public class Vehicle {
     private Integer year;
     @Min(value=0, message= "Mileage must be positive")
     private Double mileage;
-    @Min(value=0, message= "Price must be negative")
-    private Double price;
+    @NotNull(message = "Price cannot be null")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
+    private BigDecimal price;
+    @Column(nullable=false)
+    private Boolean available = true;
 
     public Vehicle() {}
 
-    public Vehicle(String make, String model, String color, Integer year, Double mileage, Double price){
+    public Vehicle(String make, String model, String color, Integer year, Double mileage, BigDecimal price, Boolean available){
         this.make = make;
         this.model = model;
         this.color = color;
         this.year = year;
         this.mileage = mileage;
         this.price = price;
+        this.available = available;
     }
 
     public long getId() {return id; }
@@ -45,10 +51,12 @@ public class Vehicle {
     public void setYear(int year) {this.year = year; }
     public Double getMileage() {return mileage; }
     public void setMileage(Double mileage) { this.mileage = mileage; }
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) {this.price = price; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) {this.price = price; }
     public String getColor() { return color;}
     public void setColor(String color) { this.color = color;}
+    public Boolean getAvailable() { return available; }
+    public void setAvailable(Boolean available) { this.available = available; }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dealer_id")
