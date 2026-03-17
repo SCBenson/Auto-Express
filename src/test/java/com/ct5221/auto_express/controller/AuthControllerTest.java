@@ -1,10 +1,7 @@
 package com.ct5221.auto_express.controller;
 import com.ct5221.auto_express.dto.LoginRequest;
 import com.ct5221.auto_express.dto.LoginResponse;
-import com.ct5221.auto_express.service.AuthService;
-import com.ct5221.auto_express.service.DealerService;
-import com.ct5221.auto_express.service.UserService;
-import com.ct5221.auto_express.service.VehicleService;
+import com.ct5221.auto_express.service.*;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;
@@ -39,6 +36,9 @@ public class AuthControllerTest {
 
     @MockitoBean
     private DealerService dealerService;
+
+    @MockitoBean
+    private OrderService orderService;
 
     @Test
     @WithMockUser
