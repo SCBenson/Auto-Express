@@ -12,7 +12,7 @@
 - [X] Create simple `JwtUtil` class (copy from tutorial) Add parameters location & dealershipName to DTO, Service, Controller
 - [X] Create `AuthController` with login endpoint only
 - [X] Unit Test the `AuthController`
-- [ ] Test login manually with Postman
+- [X] Test login manually with Postman
 
 ### Days 5-6: Move Logic to Services
 - [ ] Create service methods in `DealerService`, `UserService`, `VehicleService`
