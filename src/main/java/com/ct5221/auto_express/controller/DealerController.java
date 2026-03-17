@@ -118,7 +118,7 @@ public class DealerController {
     }
 
     private Dealer convertToEntity(DealerDTO dto){
-        return new Dealer(dto.getUsername(), dto.getFirstName(), dto.getLastName(), dto.getEmail(), dto.getAge(), dto.getPhone(), dto.getPassword());
+        return new Dealer(dto.getFirstName(), dto.getLastName(), dto.getUsername(), dto.getEmail(), dto.getAge(), dto.getPhone(), dto.getPassword(), dto.getDealershipName(), dto.getLocation());
     }
 
 

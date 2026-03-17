@@ -127,6 +127,6 @@ public class UserController {
     }
 
     private User convertToEntity(UserDTO dto) {
-        return new User(dto.getUsername(), dto.getFirstName(), dto.getLastName(), dto.getEmail(), dto.getAge(), dto.getPhone(), dto.getPassword());
+        return new User(dto.getFirstName(), dto.getLastName(), dto.getUsername(), dto.getEmail(), dto.getAge(), dto.getPhone(), dto.getPassword(), dto.getLocation());
     }
 }
