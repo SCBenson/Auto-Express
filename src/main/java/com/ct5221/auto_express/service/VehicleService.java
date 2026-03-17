@@ -6,6 +6,7 @@ import com.ct5221.auto_express.domain.VehicleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Year;
 import java.util.List;
 import java.util.Optional;
@@ -42,10 +43,13 @@ public class VehicleService {
 
         validateVehicle(vehicleDetails);
 
-        vehicle.setMake(vehicleDetails.getMake());
-        vehicle.setModel(vehicleDetails.getModel());
+        vehicle.setMake(normalize(vehicleDetails.getMake()));
+        vehicle.setModel(normalize(vehicleDetails.getModel()));
+        vehicle.setColor(vehicleDetails.getColor());
         vehicle.setYear(vehicleDetails.getYear());
+        vehicle.setMileage(vehicleDetails.getMileage());
         vehicle.setPrice(vehicleDetails.getPrice());
+        vehicle.setAvailable(vehicleDetails.getAvailable());
 
         return vehicleRepository.save(vehicle);
     }
@@ -60,11 +64,17 @@ public class VehicleService {
         if(vehicle.getMake() == null || vehicle.getMake().trim().isEmpty()){
             throw new IllegalArgumentException("Vehicle make is required");
         }
+        if(vehicle.getModel() == null || vehicle.getModel().trim().isEmpty()){
+            throw new IllegalArgumentException("Vehicle model is required");
+        }
         int currentYear = Year.now().getValue();
         if(vehicle.getYear() < 1886 || vehicle.getYear() > currentYear + 1){
             throw new IllegalArgumentException("Vehicle year must be between 1886 and " + (currentYear + 1));
         }
-        if(vehicle.getPrice() < 0) {
+        if(vehicle.getPrice() == null){
+            throw new IllegalArgumentException("Vehicle price is required");
+        }
+        if(vehicle.getPrice().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Vehicle price cannot be negative");
         }
     }
