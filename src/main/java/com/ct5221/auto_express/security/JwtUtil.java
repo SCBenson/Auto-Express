@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -11,11 +12,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Component
 public class JwtUtil {
     //Store this securely for production.
     private final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
 
     private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+
+    public String generateToken(String email, String role, Long userId){
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        claims.put("userId", userId);
+        return createToken(claims, email);
+    }
 
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
