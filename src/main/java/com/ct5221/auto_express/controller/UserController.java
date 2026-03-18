@@ -1,6 +1,7 @@
 package com.ct5221.auto_express.controller;
 
 import com.ct5221.auto_express.domain.User;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import com.ct5221.auto_express.dto.UserDTO;
 import com.ct5221.auto_express.exception.ResourceExceptionHandler;
@@ -21,109 +22,55 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        if (userDTO.getUsername() == null || userDTO.getEmail() == null) {
-            throw new ResourceExceptionHandler("Username and email are required");
-        }
-        User user = convertToEntity(userDTO);
-        User created = userService.createUser(user);
-        return new ResponseEntity<>(convertToDTO(created), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDTO createUser(@Valid @RequestBody UserDTO userDTO) {
+        return userService.createUser(userDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(users);
+    public List<UserDTO> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id)
-                .orElseThrow(() -> new ResourceExceptionHandler("User not found with id: " + id));
-        return ResponseEntity.ok(convertToDTO(user));
+    public UserDTO getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        User user = convertToEntity(userDTO);
-        User updated = userService.updateUser(id, user);
-        if (updated == null) {
-            throw new ResourceExceptionHandler("User not found with id: " + id);
-        }
-        return ResponseEntity.ok(convertToDTO(updated));
+    public UserDTO updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+        return userService.updateUser(id, userDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        if (!userService.getUserById(id).isPresent()) {
-            throw new ResourceExceptionHandler("User not found with id: " + id);
-        }
-        userService.deleteUserById(id);
-        return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 
     @GetMapping("/search/username/{username}")
-    public ResponseEntity<UserDTO> findByUsername(@PathVariable String username) {
-        User user = userService.findByUsername(username)
-                .orElseThrow(() -> new ResourceExceptionHandler("User not found with username: " + username));
-        return ResponseEntity.ok(convertToDTO(user));
+    public UserDTO findByUsername(@PathVariable String username) {
+        return userService.findByUsername(username);
     }
 
     @GetMapping("/search/email/{email}")
-    public ResponseEntity<UserDTO> findByEmail(@PathVariable String email) {
-        User user = userService.findByEmail(email)
-                .orElseThrow(() -> new ResourceExceptionHandler("User not found with email: " + email));
-        return ResponseEntity.ok(convertToDTO(user));
+    public UserDTO findByEmail(@PathVariable String email) {
+        return userService.findByEmail(email);
     }
 
     @GetMapping("/search/phone/{phone}")
-    public ResponseEntity<UserDTO> findByPhone(@PathVariable String phone) {
-        User user = userService.findByPhone(phone)
-                .orElseThrow(() -> new ResourceExceptionHandler("User not found with phone: " + phone));
-        return ResponseEntity.ok(convertToDTO(user));
-    }
-
-    @GetMapping("/search/username-contains/{keyword}")
-    public ResponseEntity<List<UserDTO>> findByUsernameContains(@PathVariable String keyword) {
-        List<UserDTO> users = userService.getAllUsers()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(users);
+    public UserDTO findByPhone(@PathVariable String phone) {
+        return userService.findByPhone(phone);
     }
 
     @PutMapping("/{userId}/purchase-vehicle/{vehicleId}")
-    public ResponseEntity<UserDTO> purchaseVehicle(@PathVariable Long userId, @PathVariable Long vehicleId) {
-        User user = userService.purchaseVehicle(userId, vehicleId);
-        if (user == null) {
-            throw new ResourceExceptionHandler("User not found with id: " + userId);
-        }
-        return ResponseEntity.ok(convertToDTO(user));
+    public UserDTO purchaseVehicle(@PathVariable Long userId, @PathVariable Long vehicleId) {
+        return userService.purchaseVehicle(userId, vehicleId);
     }
 
     @PutMapping("/{id}/update-password")
-    public ResponseEntity<String> updatePassword(@PathVariable Long id, @RequestBody String newPassword) {
-        if (newPassword == null || newPassword.length() < 6) {
-            throw new ResourceExceptionHandler("Password must be at least 6 characters long");
-        }
+    public void updatePassword(@PathVariable Long id, @RequestBody String newPassword) {
         userService.updatePassword(id, newPassword);
-        return ResponseEntity.ok("Password updated successfully");
-    }
-
-    private UserDTO convertToDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-        dto.setAge(user.getAge());
-        dto.setPhone(user.getPhone());
-        dto.setPassword(user.getPassword());
-        return dto;
     }
 
     private User convertToEntity(UserDTO dto) {
