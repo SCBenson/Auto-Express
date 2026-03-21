@@ -23,63 +23,32 @@ public class VehicleController {
 
     @PostMapping
     public ResponseEntity<VehicleDTO> createVehicle(@RequestBody VehicleDTO vehicleDTO) {
-        if(vehicleDTO.getMake() == null || vehicleDTO.getModel() == null) {
-            throw new BadRequestException("Make a model are required");
-        }
-        Vehicle vehicle = convertToEntity(vehicleDTO);
-        Vehicle created = vehicleService.createVehicle(vehicle);
-        return new ResponseEntity<>(convertToDTO(created), HttpStatus.CREATED);
+        VehicleDTO createdVehicle = vehicleService.createVehicle(vehicleDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
     }
 
     @GetMapping
     public ResponseEntity<List<VehicleDTO>> getAllVehicles(){
-        List<VehicleDTO> vehicles = vehicleService.getAllVehicles()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        List<VehicleDTO> vehicles = vehicleService.getAllVehicles();
         return ResponseEntity.ok(vehicles);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<VehicleDTO> getVehicleById(@PathVariable Long id){
-        Vehicle vehicle = vehicleService.getVehicleById(id)
-                .orElseThrow(() -> new ResourceExceptionHandler("Vehicle not found with id"));
-        return ResponseEntity.ok(convertToDTO(vehicle));
+        return vehicleService.getVehicleById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VehicleDTO> updateVehicle(@PathVariable Long id, @RequestBody VehicleDTO vehicleDTO){
-        Vehicle vehicle = convertToEntity(vehicleDTO);
-        Vehicle updated = vehicleService.updateVehicle(id, vehicle);
-        if(updated == null){
-            throw new ResourceExceptionHandler("Vehicle not found with id: " + id);
-        }
-        return ResponseEntity.ok(convertToDTO(updated));
+        VehicleDTO updatedVehicle = vehicleService.updateVehicle(id, vehicleDTO);
+        return ResponseEntity.ok(updatedVehicle);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id){
-        if(!vehicleService.getVehicleById(id).isPresent()){
-            throw new ResourceExceptionHandler("Vehicle not found with id: " + id);
-        }
         vehicleService.deleteVehicleById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    private VehicleDTO convertToDTO(Vehicle vehicle){
-        VehicleDTO dto = new VehicleDTO();
-        dto.setId(vehicle.getId());
-        dto.setMake(vehicle.getMake());
-        dto.setModel(vehicle.getModel());
-        dto.setColor(vehicle.getColor());
-        dto.setYear(vehicle.getYear());
-        dto.setMileage(vehicle.getMileage());
-        dto.setPrice(vehicle.getPrice());
-        dto.setAvailable(vehicle.getAvailable());
-        return dto;
-    }
-
-    private Vehicle convertToEntity(VehicleDTO dto){
-        return new Vehicle(dto.getMake(), dto.getModel(), dto.getColor(), dto.getYear(), dto.getMileage(), dto.getPrice(), dto.getAvailable());
     }
 }
