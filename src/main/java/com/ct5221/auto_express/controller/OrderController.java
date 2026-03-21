@@ -25,7 +25,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO){
         OrderDTO createdOrder = orderService.createOrder(orderDTO);
-        return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
     @GetMapping("/{id}")
@@ -35,7 +35,7 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderDTO>> getOrderByUser(@PathVariable Long userId){
+    public ResponseEntity<List<OrderDTO>> getOrdersByUser(@PathVariable Long userId){
         List<OrderDTO> orders = orderService.getOrdersByUserId(userId);
         return ResponseEntity.ok(orders);
     }
