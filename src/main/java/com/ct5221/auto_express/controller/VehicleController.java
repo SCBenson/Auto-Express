@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/vehicles")
+@CrossOrigin(origins = "http://localhost:5173")
 public class VehicleController {
 
     @Autowired
@@ -38,6 +39,12 @@ public class VehicleController {
         return vehicleService.getVehicleById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/dealer/{dealerId}")
+    public ResponseEntity<List<VehicleDTO>> getVehiclesByDealer(@PathVariable Long dealerId){
+        List<VehicleDTO> vehicles = vehicleService.getVehiclesByDealerId(dealerId);
+        return ResponseEntity.ok(vehicles);
     }
 
     @PutMapping("/{id}")
