@@ -4,11 +4,13 @@ import com.ct5221.auto_express.domain.Dealer;
 import com.ct5221.auto_express.domain.DealerRepository;
 import com.ct5221.auto_express.domain.Vehicle;
 import com.ct5221.auto_express.domain.VehicleRepository;
+import com.ct5221.auto_express.dto.DealerDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -22,42 +24,18 @@ public class DealerService {
         this.vehicleRepository = vehicleRepository;
     }
 
-    public Optional<Dealer> getDealerById(Long id) {
-        return dealerRepository.findById(id);
-    }
-
-    public List<Dealer> getAllDealers() {
-        return (List<Dealer>) dealerRepository.findAll();
-    }
-
-    public Optional<Dealer> findByUsername(String username) {
-        return dealerRepository.findByUsername(username);
-    }
-
-    public Optional<Dealer> findByEmail(String email) {
-        return dealerRepository.findByEmail(email);
-    }
-
-    public Optional<Dealer> findByPhone(String phone) {
-        return dealerRepository.findByPhone(phone);
-    }
-
-    public Dealer createDealer(Dealer dealer){
+    public DealerDTO createDealer(DealerDTO dealerDTO){
+        Dealer dealer = convertToEntity(dealerDTO);
         validateDealer(dealer);
-        return dealerRepository.save(dealer);
+        Dealer savedDealer = dealerRepository.save(dealer);
+        return convertToDTO(savedDealer);
     }
 
-    public void deleteDealerById(Long id) {
-        if(!dealerRepository.existsById(id)) {
-            throw new RuntimeException("Dealer not found with id " + id);
-        }
-        dealerRepository.deleteById(id);
-    }
-
-    public Dealer updateDealer(Long id, Dealer dealerDetails) {
+    public DealerDTO updateDealer(Long id, DealerDTO dealerDTO) {
         Dealer dealer = dealerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dealer not found with id " + id));
 
+        Dealer dealerDetails = convertToEntity(dealerDTO);
         validateDealer(dealerDetails);
 
         Optional<Dealer> existingDealer = dealerRepository.findById(dealerDetails.getId());
@@ -70,26 +48,65 @@ public class DealerService {
         dealer.setPhone(normalizePhone(dealerDetails.getPhone()));
         dealer.setPassword(dealerDetails.getPassword());
 
-        return dealerRepository.save(dealer);
+        Dealer updatedDealer = dealerRepository.save(dealer);
+        return convertToDTO(updatedDealer);
     }
 
-    public Dealer addVehicleToInventory(Long dealerId, Long vehicleId) {
+    public List<DealerDTO> getAllDealers() {
+        List<Dealer> dealers = (List<Dealer>) dealerRepository.findAll();
+        return dealers.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<DealerDTO> getDealerById(Long id) {
+        return dealerRepository.findById(id)
+                .map(this::convertToDTO);
+    }
+    public Optional<DealerDTO> getDealerByUsername(String username){
+        return dealerRepository.findByUsername(username)
+                .map(this::convertToDTO);
+    }
+
+    public void deleteDealerById(Long id) {
+        if(!dealerRepository.existsById(id)) {
+            throw new RuntimeException("Dealer not found with id " + id);
+        }
+        dealerRepository.deleteById(id);
+    }
+
+    public Optional<DealerDTO> findByUsername(String username) {
+        return dealerRepository.findByUsername(username)
+                .map(this::convertToDTO);
+    }
+
+    public Optional<DealerDTO> findByEmail(String email) {
+        return dealerRepository.findByEmail(email)
+                .map(this::convertToDTO);
+    }
+
+    public Optional<DealerDTO> findByPhone(String phone) {
+        return dealerRepository.findByPhone(phone)
+                .map(this::convertToDTO);
+    }
+
+    public DealerDTO addVehicleToInventory(Long dealerId, Long vehicleId) {
         Dealer dealer = dealerRepository.findById(dealerId)
                 .orElseThrow(() -> new RuntimeException("Dealer not found"));
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
-        //Vehicle vehicle = vehicleOpt.get();
         vehicle.setDealer(dealer);
         dealer.getInventory().add(vehicle);
-        return dealerRepository.save(dealer);
+        Dealer savedDealer = dealerRepository.save(dealer);
+        return convertToDTO(savedDealer);
     }
 
-    public Dealer updateContactInfo(Long id, String email, String phone) {
+    public Optional<DealerDTO> updateContactInfo(Long id, String email, String phone) {
         Optional<Dealer> dealerOpt = dealerRepository.findById(id);
         if(!dealerOpt.isPresent()){
-            return null;
+            return Optional.empty();
         }
 
         Dealer dealer = dealerOpt.get();
@@ -99,7 +116,8 @@ public class DealerService {
         if(phone != null && !phone.isEmpty()){
             dealer.setPhone(phone);
         }
-        return dealerRepository.save(dealer);
+        Dealer savedDealer = dealerRepository.save(dealer);
+        return Optional.of(convertToDTO(savedDealer));
     }
 
     private void validateDealer(Dealer dealer){
@@ -138,11 +156,32 @@ public class DealerService {
         return phone.replaceAll("[^0-9+]", "");
     }
 
-    public Optional<Dealer> getDealerByUsername(String username){
-        return dealerRepository.findByUsername(username);
+    private DealerDTO convertToDTO(Dealer dealer){
+        DealerDTO dto = new DealerDTO();
+        dto.setId(dealer.getId());
+        dto.setUsername(dealer.getUsername());
+        dto.setFirstName(dealer.getFirstName());
+        dto.setLastName(dealer.getLastName());
+        dto.setEmail(dealer.getEmail());
+        dto.setAge(dealer.getAge());
+        dto.setPhone(dealer.getPhone());
+        dto.setDealershipName(dealer.getDealershipName());
+        dto.setLocation(dealer.getLocation());
+        return dto;
     }
 
-    public List<Dealer> searchDealers(String searchTerm) {
-        return dealerRepository.findByUsernameContainingIgnoreCase(searchTerm);
+    private Dealer convertToEntity(DealerDTO dto){
+        Dealer dealer = new Dealer();
+        dealer.setId(dto.getId());
+        dealer.setUsername(dto.getUsername());
+        dealer.setFirstName(dto.getFirstName());
+        dealer.setLastName(dto.getLastName());
+        dealer.setEmail(dto.getEmail());
+        dealer.setAge(dto.getAge());
+        dealer.setPhone(dto.getPhone());
+        dealer.setDealershipName(dto.getDealershipName());
+        dealer.setLocation(dto.getLocation());
+        dealer.setPassword(dto.getPassword());
+        return dealer;
     }
 }

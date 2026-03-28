@@ -4,13 +4,17 @@ import com.ct5221.auto_express.domain.User;
 import com.ct5221.auto_express.domain.UserRepository;
 import com.ct5221.auto_express.domain.VehicleRepository;
 import com.ct5221.auto_express.domain.Vehicle;
+import com.ct5221.auto_express.dto.UserDTO;
+import com.ct5221.auto_express.exception.BadRequestException;
 import com.ct5221.auto_express.exception.ResourceExceptionHandler;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -24,63 +28,115 @@ public class UserService {
         this.vehicleRepository = vehicleRepository;
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public UserDTO createUser(UserDTO userDTO) {
+        // Validation
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new BadRequestException("Email already exists: " + userDTO.getEmail());
+        }
+
+        // Business logic
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setPassword(userDTO.getPassword()); // In real app, hash with BCrypt!
+        user.setAge(userDTO.getAge());
+        user.setPhone(userDTO.getPhone());
+        user.setLocation(userDTO.getLocation()); // In real app, hash this!
+
+        User saved = userRepository.save(user);
+        return convertToDTO(saved);
     }
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public Optional<User> findByPhone(String phone) {
-        return userRepository.findByPhone(phone);
+    public UserDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("User not found with id: " + id));
+        return convertToDTO(user);
     }
 
-    public List<User> findByUsernameContains(String keyword){
-        return userRepository.findByUsernameContains(keyword);
+    public UserDTO findByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BadRequestException("User not found with username: " + username));
+        return convertToDTO(user);
+    }
+    public UserDTO findByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("User not found with email: " + email));
+        return convertToDTO(user);
     }
 
-    public User purchaseVehicle(Long userId, Long vehicleId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if(user == null) return null;
-        Vehicle vehicle = vehicleRepository.findById(vehicleId).orElse(null);
-        if(vehicle == null) return null;
+    public UserDTO findByPhone(String phone) {
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new BadRequestException("User not found with phone: " + phone));
+        return convertToDTO(user);
+    }
+
+    public UserDTO purchaseVehicle(Long userId, Long vehicleId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("User not found with id: " + userId));
+
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new BadRequestException("Vehicle not found with id: " + vehicleId));
+
+        if(!vehicle.getAvailable()){
+            throw new BadRequestException("Vehicle with id " + vehicleId + " is not available for purchase");
+        }
 
         user.getPurchasedVehicles().add(vehicle);
-        return userRepository.save(user);
+        vehicle.setAvailable(false);
+
+        vehicleRepository.save(vehicle);
+        User updated = userRepository.save(user);
+
+        return convertToDTO(updated);
     }
 
-    public List<User> getAllUsers(){ return (List<User>) userRepository.findAll(); }
+    public List<UserDTO> getAllUsers(){
+        return userRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
 
-    public User createUser(User user) {
-
-        validateUser(user);
-        return userRepository.save(user);
     }
 
-    public User updateUser(Long id, User userDetails) {
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
 
-        user.setUsername(userDetails.getUsername());
-        user.setEmail(userDetails.getEmail());
-        user.setPhone(userDetails.getPhone());
-        user.setPassword(userDetails.getPassword());
+        if (!user.getEmail().equals(userDTO.getEmail())) {
+            userRepository.findByEmail(userDTO.getEmail()).ifPresent(u -> {
+                throw new BadRequestException("Email already exists: " + userDTO.getEmail());
+            });
+        }
 
-        return userRepository.save(user);
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setPhone(userDTO.getPhone());
+        user.setPassword(userDTO.getPassword());
+
+        User updated = userRepository.save(user);
+
+        return convertToDTO(updated);
     }
 
-    public void updatePassword(Long id, String newPassword){
-        userRepository.findById(id).ifPresent(user -> {
-            user.setPassword(newPassword);
-            userRepository.save(user);
-        });
+    public void updatePassword(Long id, String newPassword) {
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new BadRequestException("Password cannot be empty");
+        }
+
+        if (newPassword.length() < 6) {
+            throw new BadRequestException("Password must be at least 6 characters long");
+        }
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("User not found with id: " + id));
+
+        user.setPassword(newPassword); // In production, hash with BCrypt!
+        userRepository.save(user);
     }
 
-    public void deleteUserById(Long id) {
+    public void deleteUser(Long id) {
         if(!userRepository.existsById(id)) {
             throw new RuntimeException("User not found with id " + id);
         }
@@ -135,5 +191,19 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceExceptionHandler("User not found with id: " + userId));
         return new ArrayList<>(user.getPurchasedVehicles());
+    }
+
+    private UserDTO convertToDTO(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setAge(user.getAge());
+        dto.setPhone(user.getPhone());
+        dto.setPassword(user.getPassword());
+        dto.setLocation(user.getLocation());
+        return dto;
     }
 }

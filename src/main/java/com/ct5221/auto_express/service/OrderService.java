@@ -27,6 +27,8 @@ public class OrderService {
     }
 
     public OrderDTO createOrder(OrderDTO orderDTO){
+        validateOrderDTO(orderDTO);
+
         User user = userRepository.findById(orderDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + orderDTO.getUserId()));
         Vehicle vehicle = vehicleRepository.findById(orderDTO.getVehicleId())
@@ -43,7 +45,7 @@ public class OrderService {
         order.setDealer(dealer);
         order.setOrderDate(LocalDateTime.now());
         order.setTotalPrice(vehicle.getPrice());
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.PROCESSING);
 
         vehicle.setAvailable(false);
         vehicleRepository.save(vehicle);
@@ -67,6 +69,9 @@ public class OrderService {
     }
 
     public List<OrderDTO> getOrdersByUserId(Long userId){
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id " + userId);
+        }
         List<Order> orders = orderRepository.findByUserId(userId);
         return orders.stream()
                 .map(this::convertToDTO)
@@ -74,7 +79,10 @@ public class OrderService {
     }
 
     public List<OrderDTO> getOrdersByDealerId(Long dealerId){
-        List<Order> orders = orderRepository.findByDealerId(dealerId);
+        if (!dealerRepository.existsById(dealerId)) {
+            throw new RuntimeException("Dealer not found with id " + dealerId);
+        }
+        List<Order> orders = orderRepository.findByUserId(dealerId);
         return orders.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -87,13 +95,15 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public OrderDTO updateOrderStatus(Long id, OrderStatus newStatus){
+    public OrderDTO updateOrderStatus(Long id, OrderStatus status){
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
-        OrderStatus oldStatus = order.getStatus();
-        order.setStatus(newStatus);
 
-        if(newStatus == OrderStatus.CANCELLED && oldStatus != OrderStatus.CANCELLED){
+        validateStatusTransition(order.getStatus(), status);
+
+        order.setStatus(status);
+
+        if(status == OrderStatus.CANCELLED){
             Vehicle vehicle = order.getVehicle();
             vehicle.setAvailable(true);
             vehicleRepository.save(vehicle);
@@ -103,14 +113,40 @@ public class OrderService {
         return convertToDTO(updatedOrder);
     }
 
-    public void deleteOrder(Long id){
+    public void deleteOrder(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Order not found with id " + id));
+
+        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.PROCESSING) {
+            throw new IllegalStateException("Cannot delete order with status " + order.getStatus());
+        }
+
         Vehicle vehicle = order.getVehicle();
         vehicle.setAvailable(true);
         vehicleRepository.save(vehicle);
 
-        orderRepository.delete(order);
+        orderRepository.deleteById(id);
+    }
+
+    private void validateOrderDTO(OrderDTO orderDTO) {
+        if (orderDTO.getUserId() == null) {
+            throw new IllegalArgumentException("User ID is required");
+        }
+        if (orderDTO.getVehicleId() == null) {
+            throw new IllegalArgumentException("Vehicle ID is required");
+        }
+        if (orderDTO.getDealerId() == null) {
+            throw new IllegalArgumentException("Dealer ID is required");
+        }
+    }
+
+    private void validateStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
+        if (currentStatus == OrderStatus.COMPLETED && newStatus != OrderStatus.COMPLETED) {
+            throw new IllegalStateException("Cannot change status of completed order");
+        }
+        if (currentStatus == OrderStatus.CANCELLED && newStatus != OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot change status of cancelled order");
+        }
     }
 
     public OrderDTO convertToDTO(Order order){
