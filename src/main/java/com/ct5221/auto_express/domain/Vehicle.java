@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Vehicle {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @NotNull(message = "Make cannot be null")
     private String make;
     @NotNull(message = "Model cannot be null")
@@ -28,6 +28,9 @@ public class Vehicle {
     private BigDecimal price;
     @Column(nullable=false)
     private Boolean available = true;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dealer_id")
+    private Dealer dealer;
 
     public Vehicle() {}
 
@@ -57,15 +60,9 @@ public class Vehicle {
     public void setColor(String color) { this.color = color;}
     public Boolean getAvailable() { return available; }
     public void setAvailable(Boolean available) { this.available = available; }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dealer_id")
-    private Dealer dealer; // A vehicle belongs to one dealer.
-
     public Dealer getDealer(){
         return dealer;
     }
-
     public void setDealer(Dealer dealer){
         this.dealer = dealer;
     }
