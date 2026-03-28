@@ -2,6 +2,7 @@ package com.ct5221.auto_express.service;
 
 
 import com.ct5221.auto_express.domain.Dealer;
+import com.ct5221.auto_express.domain.DealerRepository;
 import com.ct5221.auto_express.domain.Vehicle;
 import com.ct5221.auto_express.domain.VehicleRepository;
 import com.ct5221.auto_express.dto.VehicleDTO;
@@ -18,17 +19,30 @@ import java.util.stream.Collectors;
 @Transactional
 public class VehicleService {
     private final VehicleRepository vehicleRepository;
+    private final DealerRepository dealerRepository;
 
-    public VehicleService(VehicleRepository vehicleRepository) {
+    public VehicleService(VehicleRepository vehicleRepository, DealerRepository dealerRepository) {
         this.vehicleRepository = vehicleRepository;
+        this.dealerRepository = dealerRepository;
     }
 
     public VehicleDTO createVehicle(VehicleDTO vehicleDTO){
-        Vehicle vehicle = convertToEntity(vehicleDTO);
-        validateVehicle(vehicle);
+        Vehicle vehicle = new Vehicle();
 
-        vehicle.setMake(normalize(vehicle.getMake()));
-        vehicle.setModel(normalize(vehicle.getModel()));
+        vehicle.setMake(vehicleDTO.getMake());
+        vehicle.setModel(vehicleDTO.getModel());
+        vehicle.setYear(vehicleDTO.getYear());
+        vehicle.setPrice(vehicleDTO.getPrice());
+        vehicle.setColor(vehicleDTO.getColor());
+        vehicle.setMileage(vehicleDTO.getMileage());
+        vehicle.setAvailable(vehicleDTO.getAvailable());
+
+        if(vehicleDTO.getDealerId() != null) {
+            Dealer dealer = dealerRepository.findById(vehicleDTO.getDealerId())
+                    .orElseThrow(() -> new RuntimeException("Dealer not found with id " + vehicleDTO.getDealerId()));
+            vehicle.setDealer(dealer);
+        }
+
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
         return convertToDTO(savedVehicle);
     }
@@ -48,6 +62,12 @@ public class VehicleService {
         vehicle.setPrice(vehicleDetails.getPrice());
         vehicle.setAvailable(vehicleDetails.getAvailable());
 
+        if(vehicleDTO.getDealerId() != null) {
+            Dealer dealer = dealerRepository.findById(vehicleDTO.getDealerId())
+                    .orElseThrow(() -> new RuntimeException("Dealer not found with id " + vehicleDTO.getDealerId()));
+            vehicle.setDealer(dealer);
+        }
+
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
         return convertToDTO(updatedVehicle);
     }
@@ -62,6 +82,16 @@ public class VehicleService {
     public Optional<VehicleDTO> getVehicleById(Long id) {
         return vehicleRepository.findById(id)
                 .map(this::convertToDTO);
+    }
+
+    public List<VehicleDTO> getVehiclesByDealerId(Long dealerId) {
+        if(!dealerRepository.existsById(dealerId)) {
+            throw new RuntimeException("Dealer not found with id " + dealerId);
+        }
+        List<Vehicle> vehicles = vehicleRepository.findByDealerId(dealerId);
+        return vehicles.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public void deleteVehicleById(Long id) {
@@ -102,6 +132,9 @@ public class VehicleService {
         dto.setMileage(vehicle.getMileage());
         dto.setPrice(vehicle.getPrice());
         dto.setAvailable(vehicle.getAvailable());
+        if(vehicle.getDealer() != null) {
+            dto.setDealerId(vehicle.getDealer().getId());
+        }
         return dto;
     }
 
